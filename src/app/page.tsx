@@ -12,8 +12,8 @@ export default async function Home() {
       redirect("/dashboard");
     }
   } catch {
-    // Supabase connection error - redirect to login
+    // Supabase connection error
   }
 
-  redirect("/login");
+  redirect("/landing");
 }

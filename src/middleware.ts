@@ -39,8 +39,8 @@ export async function middleware(request: NextRequest) {
     .getAll()
     .some((c) => c.name.startsWith("sb-"));
 
-  // Auth pages - redirect to dashboard if already logged in
-  const authPages = ["/login", "/register"];
+  // Auth/public pages - redirect to dashboard if already logged in
+  const authPages = ["/login", "/register", "/landing"];
   const isAuthPage = authPages.some(
     (page) => request.nextUrl.pathname === page
   );
