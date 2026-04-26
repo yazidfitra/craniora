@@ -43,11 +43,11 @@ npm run build
 # Setup PM2
 echo ">> Starting with PM2..."
 pm2 delete craniora 2>/dev/null || true
-pm2 start npm --name "craniora" -- start -- -p 3000
+pm2 start npm --name "craniora" -- start -- -p 3210
 pm2 save
 
 echo ""
 echo "=== Deploy Complete ==="
-echo "App running on port 3000"
-echo "Make sure Nginx proxies to localhost:3000"
+echo "App running on port 3210"
+echo "Make sure Nginx proxies to localhost:3210"
 echo ""
