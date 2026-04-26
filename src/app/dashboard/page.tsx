@@ -4,6 +4,7 @@ import QuickStats from "@/components/dashboard/quick-stats";
 import Announcements from "@/components/dashboard/announcements";
 import TodaySchedule from "@/components/dashboard/today-schedule";
 import ExamCountdown from "@/components/dashboard/exam-countdown";
+import DailyQuote from "@/components/dashboard/daily-quote";
 import type { Schedule } from "@/types/schedule";
 
 export const metadata = {
@@ -65,6 +66,9 @@ export default async function DashboardPage() {
             : "Tidak ada jadwal hari ini. Selamat beristirahat!"}
         </p>
       </section>
+
+      {/* Daily Quote */}
+      <DailyQuote />
 
       {/* Quick Stats Bento Grid */}
       <QuickStats

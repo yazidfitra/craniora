@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { subject, lecturer, day_of_week, start_time, end_time, room, notes, material_url } =
+    const { subject, lecturer, day_of_week, start_time, end_time, room, notes, material_url, category } =
       body;
 
     if (!subject?.trim()) {
@@ -102,6 +102,7 @@ export async function POST(request: Request) {
         notes: notes?.trim() || null,
         material_url: material_url?.trim() || null,
         material_name: material_url?.trim() ? "Link Materi" : null,
+        category: category || "KP",
       })
       .select()
       .single();

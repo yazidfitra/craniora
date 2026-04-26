@@ -54,7 +54,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { subject, lecturer, day_of_week, start_time, end_time, room, notes, material_url } = body;
+    const { subject, lecturer, day_of_week, start_time, end_time, room, notes, material_url, category } = body;
 
     if (!subject?.trim()) {
       return NextResponse.json(
@@ -75,6 +75,7 @@ export async function PUT(
         notes: notes?.trim() || null,
         material_url: material_url?.trim() || null,
         material_name: material_url?.trim() ? "Link Materi" : null,
+        category: category || "KP",
         updated_at: new Date().toISOString(),
       })
       .eq("id", id)

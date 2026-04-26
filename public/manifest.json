@@ -1,0 +1,27 @@
+{
+  "name": "Craniora Academy",
+  "short_name": "Craniora",
+  "description": "Platform manajemen kelas FK UNP 2025",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#faf8fd",
+  "theme_color": "#001b46",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/logo-crania.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-crania.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["education", "productivity"]
+}

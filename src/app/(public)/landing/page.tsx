@@ -52,39 +52,45 @@ export default function LandingPage() {
 
       <main className="pt-16">
         {/* Hero */}
-        <section className="relative px-6 py-16 md:py-24 flex flex-col items-center text-center overflow-hidden">
-          <div className="absolute inset-0 z-0 opacity-5 pointer-events-none bg-gradient-to-br from-primary-container via-transparent to-primary-400" />
+        <section className="relative px-6 py-12 md:py-20 flex flex-col items-center text-center overflow-hidden">
+
           <div className="relative z-10 space-y-6 max-w-2xl">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-primary-container/10 text-primary-container text-xs font-bold uppercase tracking-wider">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-primary-container/10 text-primary-container text-xs font-bold uppercase tracking-wider border border-primary-container/10">
               FK UNP 2025
             </span>
-            <h1 className="font-[var(--font-heading)] text-4xl md:text-5xl font-bold text-primary-container leading-tight">
-              Master Your Medical Journey
+            <h1 className="font-[var(--font-heading)] text-4xl md:text-6xl font-bold text-primary-container leading-tight">
+              Master Your
+              <br />
+              <span className="bg-gradient-to-r from-primary-container to-primary-400 bg-clip-text text-transparent">
+                Medical Journey
+              </span>
             </h1>
-            <p className="text-base text-on-surface-variant max-w-lg mx-auto leading-relaxed">
+            <p className="text-base md:text-lg text-on-surface-variant max-w-lg mx-auto leading-relaxed">
               Platform manajemen kelas untuk Fakultas Kedokteran Universitas
               Negeri Padang. Jadwal, bank soal, flashcards, dan berbagi ilmu
               dalam satu tempat.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
               <Link
                 href="/register"
-                className="bg-primary-container text-white py-4 px-8 rounded-xl font-semibold shadow-lg hover:bg-primary-400 active:scale-95 transition-all"
+                className="bg-primary-container text-white py-4 px-8 rounded-xl font-semibold shadow-lg shadow-primary-container/20 hover:bg-primary-400 hover:shadow-xl active:scale-95 transition-all"
               >
                 Mulai Sekarang - Gratis
               </Link>
               <Link
                 href="/login"
-                className="bg-secondary-container text-on-secondary-container py-4 px-8 rounded-xl font-semibold hover:bg-secondary-fixed active:scale-95 transition-all"
+                className="bg-white text-primary-container py-4 px-8 rounded-xl font-semibold border border-primary-50 shadow-sm hover:bg-primary-50 active:scale-95 transition-all"
               >
                 Login
               </Link>
             </div>
+
+
           </div>
         </section>
 
         {/* Features Bento Grid */}
-        <section className="px-6 py-12 max-w-5xl mx-auto">
+        <section className="px-6 py-16 max-w-5xl mx-auto">
           <div className="mb-10">
             <h2 className="font-[var(--font-heading)] text-[30px] font-semibold text-primary-container">
               Fitur Utama

@@ -37,7 +37,7 @@ export default function ScheduleView() {
     fetchSchedules();
   }, [fetchSchedules]);
 
-  const handleAdd = async (data: ScheduleFormData) => {
+  const handleAdd = async (data: ScheduleFormData, materialFile: File | null) => {
     const res = await fetch("/api/schedules", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -47,6 +47,25 @@ export default function ScheduleView() {
     if (!res.ok) {
       const result = await res.json();
       throw new Error(result.error);
+    }
+
+    // Upload material file if provided
+    if (materialFile) {
+      const schedule = await res.json();
+      if (schedule?.id) {
+        const formData = new FormData();
+        formData.append("file", materialFile);
+        formData.append("folder", "schedule-materials");
+        const uploadRes = await fetch("/api/upload-image", { method: "POST", body: formData });
+        if (uploadRes.ok) {
+          const { url } = await uploadRes.json();
+          await fetch(`/api/schedules/${schedule.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...data, material_url: url }),
+          });
+        }
+      }
     }
 
     await fetchSchedules();
