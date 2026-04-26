@@ -3,15 +3,60 @@
 import { useState, useEffect } from "react";
 import { MapPin, Clock, CalendarDays } from "lucide-react";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 import type { Schedule } from "@/types/schedule";
 
 interface TodayScheduleProps {
   schedules: Schedule[];
 }
 
-export default function TodaySchedule({ schedules }: TodayScheduleProps) {
+export default function TodaySchedule({ schedules: initialSchedules }: TodayScheduleProps) {
+  const [schedules, setSchedules] = useState<Schedule[]>(initialSchedules);
   const [dateLabel, setDateLabel] = useState("");
   const [currentTime, setCurrentTime] = useState("");
+
+  // Subscribe to real-time schedule changes
+  useEffect(() => {
+    const supabase = createClient();
+    const todayDow = new Date().getDay();
+
+    // Fetch latest schedules for today
+    const fetchSchedules = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from("schedules")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("day_of_week", todayDow)
+        .order("start_time", { ascending: true });
+
+      if (data) {
+        setSchedules(data);
+      }
+    };
+
+    const channel = supabase
+      .channel("schedules_realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "schedules",
+        },
+        () => {
+          // Refetch schedules when any change occurs
+          fetchSchedules();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   useEffect(() => {
     setDateLabel(

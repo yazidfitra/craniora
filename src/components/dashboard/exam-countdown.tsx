@@ -1,40 +1,71 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Timer, CalendarClock, Pencil, X, Check } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Timer, CalendarClock, Pencil, X, Check, Loader2, ShieldCheck } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+
+interface CountdownData {
+  id: string;
+  exam_name: string;
+  exam_date: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
 
 interface ExamCountdownProps {
-  initialExamDate?: string | null;
-  initialExamName?: string | null;
+  isAdmin: boolean;
+  initialCountdown: CountdownData | null;
 }
 
 export default function ExamCountdown({
-  initialExamDate,
-  initialExamName,
+  isAdmin,
+  initialCountdown,
 }: ExamCountdownProps) {
-  const [examDate, setExamDate] = useState(initialExamDate || "");
-  const [examName, setExamName] = useState(initialExamName || "");
+  const [countdownData, setCountdownData] = useState<CountdownData | null>(
+    initialCountdown
+  );
   const [editing, setEditing] = useState(false);
   const [tempDate, setTempDate] = useState("");
   const [tempName, setTempName] = useState("");
+  const [saving, setSaving] = useState(false);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 });
 
+  // Subscribe to Supabase Realtime for exam_countdowns changes
   useEffect(() => {
-    // Load from localStorage
-    const saved = localStorage.getItem("craniora_exam");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setExamDate(parsed.date || "");
-      setExamName(parsed.name || "");
-    }
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel("exam_countdowns_realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "exam_countdowns",
+        },
+        (payload) => {
+          if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+            setCountdownData(payload.new as CountdownData);
+          } else if (payload.eventType === "DELETE") {
+            setCountdownData(null);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
+  // Update countdown timer
   useEffect(() => {
-    if (!examDate) return;
+    if (!countdownData?.exam_date) return;
 
     const update = () => {
       const now = new Date().getTime();
-      const target = new Date(examDate).getTime();
+      const target = new Date(countdownData.exam_date).getTime();
       const diff = target - now;
 
       if (diff <= 0) {
@@ -44,7 +75,9 @@ export default function ExamCountdown({
 
       setCountdown({
         days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        hours: Math.floor(
+          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        ),
         minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
       });
     };
@@ -52,34 +85,63 @@ export default function ExamCountdown({
     update();
     const interval = setInterval(update, 60000);
     return () => clearInterval(interval);
-  }, [examDate]);
+  }, [countdownData?.exam_date]);
 
-  const handleSave = () => {
-    setExamDate(tempDate);
-    setExamName(tempName);
-    localStorage.setItem(
-      "craniora_exam",
-      JSON.stringify({ date: tempDate, name: tempName })
-    );
-    setEditing(false);
-  };
+  const handleSave = useCallback(async () => {
+    if (!tempDate || !tempName.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/countdown", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          exam_name: tempName.trim(),
+          exam_date: tempDate,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCountdownData(data);
+        setEditing(false);
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setSaving(false);
+    }
+  }, [tempDate, tempName]);
 
-  const handleClear = () => {
-    setExamDate("");
-    setExamName("");
-    localStorage.removeItem("craniora_exam");
-    setEditing(false);
-  };
+  const handleClear = useCallback(async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/countdown", { method: "DELETE" });
+      if (res.ok) {
+        setCountdownData(null);
+        setEditing(false);
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setSaving(false);
+    }
+  }, []);
 
   const startEdit = () => {
-    setTempDate(examDate);
-    setTempName(examName);
+    setTempDate(
+      countdownData?.exam_date
+        ? new Date(countdownData.exam_date).toISOString().slice(0, 16)
+        : ""
+    );
+    setTempName(countdownData?.exam_name || "");
     setEditing(true);
   };
 
-  const isPast = examDate && new Date(examDate).getTime() <= Date.now();
+  const isPast =
+    countdownData?.exam_date &&
+    new Date(countdownData.exam_date).getTime() <= Date.now();
 
-  if (editing) {
+  // Editing form (admin only)
+  if (editing && isAdmin) {
     return (
       <div className="bg-surface-card rounded-2xl border border-primary-50 p-5 shadow-sm">
         <h4 className="font-[var(--font-heading)] text-sm font-bold text-primary-container mb-4 flex items-center gap-2">
@@ -102,20 +164,27 @@ export default function ExamCountdown({
           <div className="flex gap-2">
             <button
               onClick={handleSave}
-              disabled={!tempDate}
+              disabled={!tempDate || !tempName.trim() || saving}
               className="flex-1 flex items-center justify-center gap-1 py-2 bg-primary-container text-white rounded-lg text-xs font-bold disabled:opacity-40"
             >
-              <Check className="w-3.5 h-3.5" /> Simpan
+              {saving ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Check className="w-3.5 h-3.5" />
+              )}
+              Simpan
             </button>
             <button
               onClick={() => setEditing(false)}
+              disabled={saving}
               className="px-3 py-2 border border-slate-200 rounded-lg text-xs text-slate-500"
             >
               Batal
             </button>
-            {examDate && (
+            {countdownData && (
               <button
                 onClick={handleClear}
+                disabled={saving}
                 className="px-3 py-2 border border-error/30 text-error rounded-lg text-xs"
               >
                 <X className="w-3.5 h-3.5" />
@@ -127,20 +196,29 @@ export default function ExamCountdown({
     );
   }
 
-  if (!examDate) {
-    return (
-      <button
-        onClick={startEdit}
-        className="w-full bg-surface-card rounded-2xl border border-dashed border-outline-variant p-5 shadow-sm hover:border-primary-400 transition-colors text-center group"
-      >
-        <Timer className="w-8 h-8 text-slate-300 mx-auto mb-2 group-hover:text-primary-400 transition-colors" />
-        <p className="text-sm text-slate-400 group-hover:text-primary-container font-medium">
-          Atur Countdown Ujian
-        </p>
-      </button>
-    );
+  // Empty state
+  if (!countdownData) {
+    if (isAdmin) {
+      return (
+        <button
+          onClick={startEdit}
+          className="w-full bg-surface-card rounded-2xl border border-dashed border-outline-variant p-5 shadow-sm hover:border-primary-400 transition-colors text-center group"
+        >
+          <Timer className="w-8 h-8 text-slate-300 mx-auto mb-2 group-hover:text-primary-400 transition-colors" />
+          <p className="text-sm text-slate-400 group-hover:text-primary-container font-medium">
+            Atur Countdown Ujian
+          </p>
+          <p className="text-[10px] text-slate-300 mt-1 flex items-center justify-center gap-1">
+            <ShieldCheck className="w-3 h-3" /> Hanya admin
+          </p>
+        </button>
+      );
+    }
+    // Non-admin sees nothing when no countdown is set
+    return null;
   }
 
+  // Active countdown display (visible to all users)
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-primary-container to-primary-400 rounded-2xl p-5 text-white shadow-lg">
       <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-2xl -mr-8 -mt-8" />
@@ -152,15 +230,18 @@ export default function ExamCountdown({
               Countdown
             </span>
           </div>
-          <button
-            onClick={startEdit}
-            className="p-1 rounded hover:bg-white/10 transition-colors"
-          >
-            <Pencil className="w-3.5 h-3.5 text-white/60" />
-          </button>
+          {isAdmin && (
+            <button
+              onClick={startEdit}
+              className="p-1 rounded hover:bg-white/10 transition-colors"
+              title="Edit countdown (Admin)"
+            >
+              <Pencil className="w-3.5 h-3.5 text-white/60" />
+            </button>
+          )}
         </div>
         <p className="text-sm font-semibold mb-3 text-white/90">
-          {examName || "Ujian"}
+          {countdownData.exam_name || "Ujian"}
         </p>
         {isPast ? (
           <p className="text-lg font-bold">Ujian sudah berlalu</p>
