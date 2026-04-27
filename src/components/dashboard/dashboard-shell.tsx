@@ -47,10 +47,9 @@ const secondaryNavItems = [
 ];
 
 const bottomNavItems = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Home", href: "/dashboard", icon: LayoutDashboard },
   { label: "Jadwal", href: "/dashboard/schedule", icon: CalendarDays },
-  { label: "CraniShare", href: "/dashboard/notes", icon: Share2 },
-  { label: "Uang Kas", href: "/dashboard/treasury", icon: Wallet },
+  { label: "Notes", href: "/dashboard/notes", icon: Share2 },
   { label: "Tools", href: "/dashboard/tools", icon: Dices },
   { label: "Profil", href: "/dashboard/profile", icon: UserCircle },
 ];
@@ -272,24 +271,27 @@ export default function DashboardShell({
       </div>
 
       {/* ===== MOBILE BOTTOM NAV ===== */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-16 bg-[#fdfcf8] border-t border-slate-200 shadow-[0_-2px_10px_rgba(0,27,70,0.08)] lg:hidden">
+      <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 bg-white border-t border-slate-200 shadow-[0_-2px_10px_rgba(0,27,70,0.08)] lg:hidden">
         {bottomNavItems.map((item) => {
           const active = isNavActive(item.href);
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl transition-transform duration-150 active:scale-90 ${
+              className={`flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-lg transition-all duration-150 active:scale-95 ${
                 active
-                  ? "text-primary-container bg-primary-container/10"
-                  : "text-slate-500 hover:bg-slate-100"
+                  ? "text-primary-container"
+                  : "text-slate-400"
               }`}
+              title={item.label}
             >
               <item.icon
-                className="w-6 h-6"
-                fill={active ? "currentColor" : "none"}
+                className={`w-6 h-6 transition-all ${active ? "scale-110" : ""}`}
+                strokeWidth={active ? 2.5 : 2}
               />
-              <span className="font-[var(--font-heading)] text-[10px] font-medium">
+              <span className={`text-[9px] font-medium transition-all ${
+                active ? "opacity-100" : "opacity-0"
+              }`}>
                 {item.label}
               </span>
             </Link>
