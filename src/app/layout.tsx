@@ -6,13 +6,15 @@ import Script from "next/script";
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-heading",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["600", "700"],
+  display: "swap",
 });
 
 const inter = Inter({
   variable: "--font-body",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -21,8 +23,8 @@ export const metadata: Metadata = {
     "Platform manajemen kelas untuk Fakultas Kedokteran Universitas Negeri Padang angkatan 2025",
   manifest: "/manifest.json",
   icons: {
-    icon: "/logo-crania.jpg",
-    apple: "/logo-crania.jpg",
+    icon: "/logo-crania.webp",
+    apple: "/logo-crania.webp",
   },
   appleWebApp: {
     capable: true,
@@ -53,7 +55,7 @@ export default function RootLayout({
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <link rel="apple-touch-icon" href="/logo-crania.jpg" />
+        <link rel="apple-touch-icon" href="/logo-crania.webp" />
       </head>
       <body className="min-h-screen flex flex-col antialiased">
         {children}

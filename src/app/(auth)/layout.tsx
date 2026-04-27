@@ -13,7 +13,7 @@ export default function AuthLayout({
         <div className="flex items-center justify-between px-6 py-4 w-full max-w-[1280px] mx-auto">
           <Link href="/" className="flex items-center gap-3">
             <Image
-              src="/logo-crania.jpg"
+              src="/logo-crania.webp"
               alt="Craniora Academy"
               width={28}
               height={28}

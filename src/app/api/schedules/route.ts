@@ -1,21 +1,13 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthenticatedUser } from "@/lib/auth-helpers";
 
-// GET: Fetch schedules for current user, optionally filtered by day
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const { user, error } = await getAuthenticatedUser();
+    if (error) return error;
 
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized", detail: authError?.message },
-        { status: 401 }
-      );
-    }
+    const supabase = await createClient();
 
     const { searchParams } = new URL(request.url);
     const day = searchParams.get("day");
@@ -30,12 +22,12 @@ export async function GET(request: Request) {
       query = query.eq("day_of_week", parseInt(day));
     }
 
-    const { data, error } = await query;
+    const { data, error: dbError } = await query;
 
-    if (error) {
-      console.error("GET /api/schedules DB error:", error);
+    if (dbError) {
+      console.error("GET /api/schedules DB error:", dbError);
       return NextResponse.json(
-        { error: error.message, code: error.code, hint: error.hint },
+        { error: dbError.message, code: dbError.code, hint: dbError.hint },
         { status: 500 }
       );
     }
@@ -53,18 +45,10 @@ export async function GET(request: Request) {
 // POST: Create a new schedule
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const { user, error } = await getAuthenticatedUser();
+    if (error) return error;
 
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized", detail: authError?.message },
-        { status: 401 }
-      );
-    }
+    const supabase = await createClient();
 
     const body = await request.json();
     const { subject, lecturer, day_of_week, start_time, end_time, room, notes, material_url, category } =
@@ -89,7 +73,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data, error } = await supabase
+    const { data, error: dbError } = await supabase
       .from("schedules")
       .insert({
         user_id: user.id,
@@ -107,10 +91,10 @@ export async function POST(request: Request) {
       .select()
       .single();
 
-    if (error) {
-      console.error("POST /api/schedules DB error:", error);
+    if (dbError) {
+      console.error("POST /api/schedules DB error:", dbError);
       return NextResponse.json(
-        { error: error.message, code: error.code, hint: error.hint },
+        { error: dbError.message, code: dbError.code, hint: dbError.hint },
         { status: 500 }
       );
     }

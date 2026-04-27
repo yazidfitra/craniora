@@ -17,6 +17,10 @@ export const metadata = {
   title: "Craniora Academy - Precision in Medical Education",
 };
 
+// Landing page can be statically generated
+export const dynamic = "force-static";
+export const revalidate = 3600; // Revalidate every hour
+
 export default function LandingPage() {
   return (
     <div className="bg-background text-on-surface min-h-screen">
@@ -24,7 +28,7 @@ export default function LandingPage() {
       <header className="flex items-center justify-between px-6 h-16 w-full fixed top-0 bg-[#fdfaf5]/90 backdrop-blur-md z-50 border-b border-primary-container/10 shadow-sm">
         <div className="flex items-center gap-3">
           <Image
-            src="/logo-crania.jpg"
+            src="/logo-crania.webp"
             alt="Craniora Academy"
             width={32}
             height={32}

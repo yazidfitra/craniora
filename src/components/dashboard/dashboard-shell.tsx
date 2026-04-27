@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -18,7 +19,11 @@ import {
   Search,
   UserCircle,
 } from "lucide-react";
-import FabMenu from "./fab-menu";
+
+// Lazy load FAB menu (only needed on mobile)
+const FabMenu = dynamic(() => import("./fab-menu"), {
+  ssr: false,
+});
 
 interface DashboardShellProps {
   fullName: string;
@@ -46,6 +51,7 @@ const bottomNavItems = [
   { label: "Jadwal", href: "/dashboard/schedule", icon: CalendarDays },
   { label: "CraniShare", href: "/dashboard/notes", icon: Share2 },
   { label: "Uang Kas", href: "/dashboard/treasury", icon: Wallet },
+  { label: "Tools", href: "/dashboard/tools", icon: Dices },
   { label: "Profil", href: "/dashboard/profile", icon: UserCircle },
 ];
 
@@ -84,7 +90,7 @@ export default function DashboardShell({
         <div className="flex items-center gap-3 px-4 h-16 border-b border-slate-200 shrink-0">
           <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
             <Image
-              src="/logo-crania.jpg"
+              src="/logo-crania.webp"
               alt="Craniora Academy"
               width={36}
               height={36}

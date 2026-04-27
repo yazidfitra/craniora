@@ -1,13 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { createClient } from "@/lib/supabase/client";
 import QuickStats from "@/components/dashboard/quick-stats";
-import Announcements from "@/components/dashboard/announcements";
 import TodaySchedule from "@/components/dashboard/today-schedule";
-import ExamCountdown from "@/components/dashboard/exam-countdown";
-import DailyQuote from "@/components/dashboard/daily-quote";
 import type { Schedule } from "@/types/schedule";
+
+// Lazy load heavy components
+const Announcements = dynamic(() => import("@/components/dashboard/announcements"));
+const ExamCountdown = dynamic(() => import("@/components/dashboard/exam-countdown"));
+const DailyQuote = dynamic(() => import("@/components/dashboard/daily-quote"));
 
 interface CountdownData {
   id: string;
@@ -33,7 +36,7 @@ export default function DashboardContent({
 }: DashboardContentProps) {
   const [schedules, setSchedules] = useState<Schedule[]>(initialSchedules);
 
-  // Subscribe to real-time schedule changes for greeting message
+  // Subscribe to real-time schedule changes
   useEffect(() => {
     const supabase = createClient();
     const todayDow = new Date().getDay();
@@ -121,7 +124,7 @@ export default function DashboardContent({
         <Announcements />
         <div className="space-y-6">
           <ExamCountdown isAdmin={isAdmin} initialCountdown={initialCountdown} />
-          <TodaySchedule schedules={schedules} />
+          <TodaySchedule schedules={schedules} enableRealtime={false} />
         </div>
       </section>
     </main>

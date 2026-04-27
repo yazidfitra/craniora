@@ -19,7 +19,7 @@ export default function LoginPage() {
           <div className="flex items-center gap-2 mb-8">
             <div className="w-10 h-10 rounded-full overflow-hidden backdrop-blur-sm">
               <Image
-                src="/logo-crania.jpg"
+                src="/logo-crania.webp"
                 alt="Craniora Academy"
                 width={40}
                 height={40}
@@ -47,7 +47,7 @@ export default function LoginPage() {
           {/* Mobile logo */}
           <div className="flex items-center gap-3 mb-6 md:hidden">
             <Image
-              src="/logo-crania.jpg"
+              src="/logo-crania.webp"
               alt="Craniora Academy Logo"
               width={48}
               height={48}
@@ -76,7 +76,7 @@ export default function LoginPage() {
         {/* University logos */}
         <div className="mt-12 flex items-center justify-center gap-6 grayscale opacity-50">
           <Image
-            src="/logo-crania.jpg"
+            src="/logo-crania.webp"
             alt="UNP Logo"
             width={32}
             height={32}

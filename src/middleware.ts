@@ -29,15 +29,25 @@ export async function middleware(request: NextRequest) {
     }
   );
 
+  // Check if user has auth cookie before making expensive getUser call
+  const hasAuthCookie = request.cookies
+    .getAll()
+    .some((c) => c.name.startsWith("sb-"));
+
+  // Skip auth check for public pages if no auth cookie exists
+  const publicPages = ["/login", "/register", "/landing", "/"];
+  const isPublicPage = publicPages.some(
+    (page) => request.nextUrl.pathname === page
+  );
+
+  if (isPublicPage && !hasAuthCookie) {
+    return supabaseResponse;
+  }
+
   // This refreshes the session if expired and sets new cookies
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  // Check if user had a session cookie but it's now invalid (expired)
-  const hasAuthCookie = request.cookies
-    .getAll()
-    .some((c) => c.name.startsWith("sb-"));
 
   // Auth/public pages - redirect to dashboard if already logged in
   const authPages = ["/login", "/register", "/landing"];

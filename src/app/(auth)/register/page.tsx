@@ -16,7 +16,7 @@ export default function RegisterPage() {
         <div>
           <div className="flex items-center gap-2 mb-8">
             <Image
-              src="/logo-crania.jpg"
+              src="/logo-crania.webp"
               alt="Craniora Academy"
               width={32}
               height={32}

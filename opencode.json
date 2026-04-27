@@ -1,0 +1,53 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "enowxlabs": {
+      "models": {
+        "claude-sonnet-4.5": {
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "name": "claude-sonnet-4.5 (enowX Labs)",
+          "options": {
+            "reasoningEffort": "high"
+          }
+        },
+        "claude-opus-4.6": {
+          "limit": {
+            "context": 1000000,
+            "output": 64000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "name": "claude-opus-4.6 (enowX Labs1)",
+          "options": {
+            "reasoningEffort": "high"
+          }
+        }
+      },
+      "name": "enowX Labs",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "apiKey": "enx-5ad68f15d8112f700b88376299ca75b54b4e252d412b5ba82dd80b30d67336dc",
+        "baseURL": "https://enow2.craniora.academy/v1"
+      }
+    }
+  }
+}

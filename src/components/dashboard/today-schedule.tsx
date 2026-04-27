@@ -8,15 +8,22 @@ import type { Schedule } from "@/types/schedule";
 
 interface TodayScheduleProps {
   schedules: Schedule[];
+  enableRealtime?: boolean;
 }
 
-export default function TodaySchedule({ schedules: initialSchedules }: TodayScheduleProps) {
+export default function TodaySchedule({ schedules: initialSchedules, enableRealtime = true }: TodayScheduleProps) {
   const [schedules, setSchedules] = useState<Schedule[]>(initialSchedules);
   const [dateLabel, setDateLabel] = useState("");
   const [currentTime, setCurrentTime] = useState("");
 
-  // Subscribe to real-time schedule changes
+  // Subscribe to real-time schedule changes (optional)
   useEffect(() => {
+    if (!enableRealtime) {
+      // Just update local state when prop changes
+      setSchedules(initialSchedules);
+      return;
+    }
+
     const supabase = createClient();
     const todayDow = new Date().getDay();
 
@@ -56,7 +63,7 @@ export default function TodaySchedule({ schedules: initialSchedules }: TodaySche
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [enableRealtime, initialSchedules]);
 
   useEffect(() => {
     setDateLabel(

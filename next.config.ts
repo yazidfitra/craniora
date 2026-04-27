@@ -9,6 +9,13 @@ const nextConfig: NextConfig = {
         pathname: "/storage/v1/object/public/**",
       },
     ],
+    formats: ["image/webp", "image/avif"],
+  },
+  // Enable compression
+  compress: true,
+  // Enable experimental features for better performance
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
   },
 };
 
